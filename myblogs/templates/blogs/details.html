@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <style>
+       .body{
+            margin: 0 auto;
+            width: 80%;
+            height: 999px;
+       }
+       .left-body{
+        width: 20%;
+        height: 999px;
+        float: left;
+        border: 2px solid red;
+       }
+       .right-body{
+        padding-left: 5px;
+        background-color: white;
+        width: 50%;
+        height: 999px;
+        float: left;
+       }
+       ul{
+            padding-left:0px ;
+            list-style-type: none;
+       }
+       li{
+        border: 2px solid red;
+        margin: 1px;
+       }
+       .hide{
+            display: none;
+        }
+        .c1{
+            position: fixed;
+            top:0;
+            bottom: 0;
+            left:0;
+            right: 0;
+            background: rgba(0,0,0,.5);
+            z-index: 2;
+        }
+        .c2{
+            background-color: white;
+            position: fixed;
+            width: 400px;
+            height: 300px;
+            top:50%;
+            left: 50%;
+            z-index: 3;
+            margin-top: -150px;
+            margin-left: -200px;
+        }
+		#modal p {
+			margin-left:80px;
+
+		}
+    </style>
+
+</head>
+<script type="text/javascript">
+    function Show(){
+        document.getElementById('shade').classList.remove('hide');
+        document.getElementById('modal').classList.remove('hide');
+    }
+
+    function saveComment(){
+        var flag = '{{ user.is_authenticated }}';
+        var form = document.getElementById('from-data');
+        if(flag == 'True'){
+            form.action = '{%url 'myblogs:comments' article.id %}';
+            form.submit();
+        }else{
+            Show();
+        }
+
+    }
+
+    function Hide(){
+        document.getElementById('shade').classList.add('hide');
+        document.getElementById('modal').classList.add('hide');
+    }
+
+    function Out(){
+        var form = document.getElementById('from-data');
+        form.action = '{%url 'myblogs:loginOut' article.id %}';
+        form.submit();
+    }
+</script>
+
+<body>
+
+<div class="body">
+    <div class="left-body" align="center">
+            <p>头像</p>
+            <p>{{ article.author }}</p>
+            <p>3</p>
+            <p>4</p>
+            <p>5</p>
+            <p>4</p>
+    </div>
+    <div class="right-body">
+         <div class="title" style="text-align:center;">
+            <h1>{{ article.title }}</h1>
+         </div>
+        <div>
+            {{ article.content }}
+        </div>
+        <span class="tag" style="color: #ff9900;padding-left:50px;">{{ article.tag.tagName }}</span>
+        <span class="author" style="color: #4a86e8;">sir</span>
+        <span class="created" style="color: #6aa84e;"></span>
+        <hr>
+        <div class="comments">
+            <form action="" method="post" id="from-data">
+                {% csrf_token %}
+            <input type="hidden" id="comment_replyId">
+            <textarea cols="100" rows="4" style="" name="content" ></textarea>
+            <div>
+                {% if user.is_authenticated %}
+                <input type="button" value="退出" id="loginOut" style="float:right;margin-right:30px;" onclick="Out();">
+                {% endif %}
+                <input type="button" value="发表评论" id="login"style="float:right;margin-right:30px;" onclick="saveComment();">
+
+            </div>
+            </form>
+
+        </div>
+        <br>
+        <div>
+             <ul>
+                 {% for comment in comments %}
+                    <li >
+                    <span class="author" style="color: #4a86e8;">{{ comment.visterName }}:</span>
+                    <span class="created" style="color: #6aa84e;">{{ comment.content }}</span>
+                    </li>
+                 {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+</div>
+
+
+<div id="shade" class="c1 hide"></div>
+    <div id="modal" class="c2 hide">
+        <form method="post" action="{% url 'myblogs:login' article.id %}">
+            {% csrf_token %}
+            <p style="margin-top:50px;">用户：<input type="text" name="userName"></p>
+            <p> 密码：<input type="password" name="pasWord"></p>
+            <p style="align:center;">
+                <input type="submit" value="确定">
+                <input type="button" value="取消" onclick="Hide();">
+            </p>
+        </form>
+    </div>
+</body>
+</html>
